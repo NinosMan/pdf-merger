@@ -4,35 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Merger</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
+            background-color: #f8f9fa;
         }
         #status {
             margin-top: 10px;
-            color: red;
+        }
+        #pdfList {
+            display: none;
+            margin-top: 10px;
         }
     </style>
-</head>    
+</head>
 <body>
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h1 class="text-center my-4">PDF Merger</h1>
+        <div class="card mt-5">
+            <div class="card-body">
+                <h1 class="card-title">PDF Merger</h1>
                 <div class="form-group">
-                    <label for="url">Lecture Schedule URL: </label>
-                    <input type="text" class="form-control" id="url" placeholder="e.g., https://ecs.wgtn.ac.nz/">
+                    <label for="url">Lecture Schedule URL:</label>
+                    <input type="text" id="url" class="form-control" placeholder="e.g., https://ecs.wgtn.ac.nz/">
                 </div>
-                <button id="mergeBtn" class="btn btn-primary btn-block">Merge PDFs</button>
-                <p id="status" class="text-center mt-3"></p>
+                <div class="btn-group" role="group">
+                    <button id="fetchBtn" class="btn btn-primary">Fetch PDFs</button>
+                    <button id="mergeBtn" class="btn btn-success" style="display: none;">Merge Selected PDFs</button>
+                </div>
+                <div id="status" class="mt-3 alert" role="alert" style="display: none;"></div>
+                <div id="pdfList" class="mt-3">
+                    <h3>Select PDFs to Merge</h3>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="selectAll">
+                        <label class="form-check-label" for="selectAll">Select All</label>
+                    </div>
+                    <div id="pdfCheckboxes" class="form-group mt-3"></div>
+                </div>
             </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
