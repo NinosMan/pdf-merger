@@ -22,12 +22,12 @@ document.getElementById('fetchBtn').addEventListener('click', async () => {
         statusElement.textContent = 'Fetching PDFs...';
         statusElement.className = 'alert alert-info';
         statusElement.style.display = 'block';
-        
+
         const response = await fetch(corsProxy + encodeURIComponent(url));
         const text = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, 'text/html');
-        
+
         const links = doc.querySelectorAll('a[href$=".pdf"]');
         const pdfUrls = Array.from(links).map(link => link.href);
 
@@ -94,6 +94,7 @@ document.getElementById('mergeBtn').addEventListener('click', async () => {
     }
 
     const corsProxy = 'https://corsproxy.io/?';
+    const failedUrls = [];
 
     try {
         statusElement.textContent = 'Merging PDFs...';
@@ -101,19 +102,26 @@ document.getElementById('mergeBtn').addEventListener('click', async () => {
         statusElement.style.display = 'block';
 
         const pdfBuffers = await Promise.all(selectedPdfUrls.map(async (pdfUrl) => {
-            const res = await fetch(corsProxy + encodeURIComponent(pdfUrl));
-            return res.arrayBuffer();
+            try {
+                const res = await fetch(corsProxy + encodeURIComponent(pdfUrl));
+                return res.arrayBuffer();
+            } catch (error) {
+                failedUrls.push(pdfUrl);
+                return null;
+            }
         }));
 
         const { PDFDocument } = window.PDFLib;
         const mergedPdf = await PDFDocument.create();
 
         for (const buffer of pdfBuffers) {
-            const existingPdf = await PDFDocument.load(buffer);
-            const copiedPages = await mergedPdf.copyPages(existingPdf, existingPdf.getPageIndices());
-            copiedPages.forEach((page) => {
-                mergedPdf.addPage(page);
-            });
+            if (buffer) {
+                const existingPdf = await PDFDocument.load(buffer);
+                const copiedPages = await mergedPdf.copyPages(existingPdf, existingPdf.getPageIndices());
+                copiedPages.forEach((page) => {
+                    mergedPdf.addPage(page);
+                });
+            }
         }
 
         const mergedPdfBytes = await mergedPdf.save();
@@ -123,8 +131,14 @@ document.getElementById('mergeBtn').addEventListener('click', async () => {
         link.download = `merged_lectures.pdf`;
         link.click();
 
-        statusElement.textContent = 'Merged PDF saved.';
-        statusElement.className = 'alert alert-success';
+        let alertMessage = 'Merged PDF saved.';
+        let alertClass = 'alert alert-success';
+        if (failedUrls.length > 0) {
+            alertMessage += ` However, the following PDFs could not be merged: \n${failedUrls.join('\n')}`;
+            alertClass = 'alert alert-warning';
+        }
+        statusElement.textContent = alertMessage;
+        statusElement.className = alertClass;
     } catch (error) {
         console.error(error);
         statusElement.textContent = 'Failed to merge PDFs.';
