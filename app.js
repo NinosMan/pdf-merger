@@ -1,14 +1,18 @@
 document.getElementById('mergeBtn').addEventListener('click', async () => {
     const url = document.getElementById('url').value;
+    const statusElement = document.getElementById('status');
+    const mergeButton = document.getElementById('mergeBtn');
+
     if (!url) {
-        document.getElementById('status').textContent = 'Please enter a lecture schedule URL.';
+        statusElement.textContent = 'Please enter a lecture schedule URL.';
         return;
     }
 
     const corsProxy = 'https://corsproxy.io/?';
+    mergeButton.disabled = true;
+    statusElement.textContent = 'Fetching PDFs...';
 
     try {
-        document.getElementById('status').textContent = 'Fetching PDFs...';
         const response = await fetch(corsProxy + encodeURIComponent(url));
         const text = await response.text();
         const parser = new DOMParser();
@@ -18,7 +22,8 @@ document.getElementById('mergeBtn').addEventListener('click', async () => {
         const pdfUrls = Array.from(links).map(link => corsProxy + encodeURIComponent(link.href));
 
         if (pdfUrls.length === 0) {
-            document.getElementById('status').textContent = 'No PDFs found.';
+            statusElement.textContent = 'No PDFs found.';
+            mergeButton.disabled = false;
             return;
         }
 
@@ -45,9 +50,11 @@ document.getElementById('mergeBtn').addEventListener('click', async () => {
         link.download = `merged_lectures.pdf`;
         link.click();
 
-        document.getElementById('status').textContent = 'Merged PDF saved.';
+        statusElement.textContent = 'Merged PDF saved.';
     } catch (error) {
         console.error(error);
-        document.getElementById('status').textContent = 'Failed to merge PDFs.';
+        statusElement.textContent = 'Failed to merge PDFs.';
+    } finally {
+        mergeButton.disabled = false;
     }
 });
