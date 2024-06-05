@@ -104,8 +104,12 @@ document.getElementById('mergeBtn').addEventListener('click', async () => {
         const pdfBuffers = await Promise.all(selectedPdfUrls.map(async (pdfUrl) => {
             try {
                 const res = await fetch(corsProxy + encodeURIComponent(pdfUrl));
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch ${pdfUrl}, status: ${res.status}`);
+                }
                 return res.arrayBuffer();
             } catch (error) {
+                console.error(`Error fetching PDF: ${error.message}`);
                 failedUrls.push(pdfUrl);
                 return null;
             }
@@ -116,11 +120,17 @@ document.getElementById('mergeBtn').addEventListener('click', async () => {
 
         for (const buffer of pdfBuffers) {
             if (buffer) {
-                const existingPdf = await PDFDocument.load(buffer);
-                const copiedPages = await mergedPdf.copyPages(existingPdf, existingPdf.getPageIndices());
-                copiedPages.forEach((page) => {
-                    mergedPdf.addPage(page);
-                });
+                try {
+                    const existingPdf = await PDFDocument.load(buffer);
+                    const copiedPages = await mergedPdf.copyPages(existingPdf, existingPdf.getPageIndices());
+                    copiedPages.forEach((page) => {
+                        mergedPdf.addPage(page);
+                    });
+                } catch (error) {
+                    console.error(`Error parsing PDF: ${error.message}`);
+                    // Skip this PDF if parsing fails
+                    continue;
+                }
             }
         }
 
