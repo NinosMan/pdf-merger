@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Merger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #status {
+            margin-top: 10px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Merger</h1>
+    <label for="url">Lecture Schedule URL: </label>
+    <input type="text" id="url" placeholder="e.g., https://ecs.wgtn.ac.nz/">
+    <button id="mergeBtn">Merge PDFs</button>
+    <p id="status"></p>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
