@@ -55,7 +55,7 @@ document.getElementById('fetchBtn').addEventListener('click', async () => {
             const label = document.createElement('label');
             label.className = 'form-check-label';
             label.htmlFor = `pdf${index}`;
-            label.textContent = pdfUrl.split('/').pop(); // Display only the filename
+            label.textContent = decodeURIComponent(pdfUrl.split('/').pop()); // Display only the filename
 
             checkboxDiv.appendChild(checkbox);
             checkboxDiv.appendChild(label);
