@@ -29,7 +29,16 @@ document.getElementById('fetchBtn').addEventListener('click', async () => {
         const doc = parser.parseFromString(text, 'text/html');
 
         const links = doc.querySelectorAll('a[href$=".pdf"]');
-        const pdfUrls = Array.from(links).map(link => link.href);
+        const rawPdfUrls = Array.from(links).map(link => link.href);
+
+        const seen = new Set();
+        const pdfUrls = rawPdfUrls.filter(url => {
+            if (seen.has(url)) {
+                return false;
+            }
+            seen.add(url);
+            return true;
+        });
 
         if (pdfUrls.length === 0) {
             statusElement.textContent = 'No PDFs found.';
